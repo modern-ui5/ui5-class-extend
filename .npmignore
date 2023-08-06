@@ -1,0 +1,6 @@
+.github/
+docs/
+node_modules/
+test/
+test_build/
+*.tsbuildinfo

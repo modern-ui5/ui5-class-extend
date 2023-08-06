@@ -1,0 +1,2 @@
+wdio.conf.js linguist-vendored
+webpack.test.config.js linguist-vendored
