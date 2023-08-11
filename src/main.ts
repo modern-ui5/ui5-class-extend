@@ -300,11 +300,26 @@ export function Ui5Base<
 export function ui5Extend(name?: string) {
   return (mockClass: new (...args: any) => any, _?: any) => {
     const baseClass = Object.getPrototypeOf(mockClass);
+
+    if (
+      Object.values(Object.getOwnPropertyDescriptors(mockClass.prototype)).find(
+        (descriptor) => descriptor.get != null || descriptor.set != null
+      ) != null
+    ) {
+      throw new TypeError("Class prototype should not contain accessors");
+    }
+
     const result = baseClass.extend(
       name ?? `${mockClass.name}-${crypto.randomUUID()}`,
       Object.assign(
         {
-          constructor() {
+          constructor(this: any) {
+            for (const sym of Object.getOwnPropertySymbols(
+              mockClass.prototype
+            )) {
+              this[sym] = mockClass.prototype[sym];
+            }
+
             const instance = new mockClass();
             Object.assign(this, instance);
           },
