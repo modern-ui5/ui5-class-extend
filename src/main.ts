@@ -13,7 +13,12 @@ type OmitNever<T> = Omit<
   { [K in keyof T]: T[K] extends never ? K : never }[keyof T]
 >;
 
-type TypeStringToType<T extends string, F = any> = T extends "string"
+type TypeStringToType<
+  T extends string,
+  F = any
+> = typeof typeTag extends keyof T
+  ? T[typeof typeTag]
+  : T extends "string"
   ? string
   : T extends "int" | "float"
   ? number
@@ -27,9 +32,7 @@ type TypeStringToType<T extends string, F = any> = T extends "string"
   ? TypeStringToType<U>[]
   : F;
 
-type MetadataItemToType<T, F = any> = typeof typeTag extends keyof T
-  ? T[typeof typeTag]
-  : T extends string
+type MetadataItemToType<T, F = any> = T extends string
   ? TypeStringToType<T, F> | undefined
   : "type" extends keyof T
   ?
@@ -270,63 +273,51 @@ export function typed<T>(): <const U>(value: U) => U & { [typeTag]: T } {
   return (value) => value as any;
 }
 
-export function ui5Extend<
-  T extends new (...args: any) => any,
+let tempClassInfo: {
+  renderer?: any;
+  metadata?: MetadataOptions;
+} = {};
+
+export function Ui5Base<
+  T extends {
+    new (...args: any): any;
+    extend(name: string, classInfo: any): any;
+  },
   const M extends MetadataOptions
 >(
   base: T,
-  metadata: M
+  classInfo: {
+    renderer?: any;
+    metadata?: M;
+  }
 ): {
   new (settings?: MetadataToSettings<T, M>): InstanceType<T> &
     MetadataToInterface<M>;
-  new (id: string, settings?: MetadataToSettings<T, M>): InstanceType<T> &
+  new (id?: string, settings?: MetadataToSettings<T, M>): InstanceType<T> &
     MetadataToInterface<M>;
 } {
+  tempClassInfo = classInfo;
   return base as any;
 }
 
-class TestClass extends ui5Extend(Control, {
-  properties: {
-    text: typed<"on" | "off">()({
-      type: "string",
-      defaultValue: "on",
-    }),
-    active: {
-      type: "boolean",
-    },
-  },
-  aggregations: {
-    button: {
-      multiple: false,
-    },
-    items: {
-      singularName: "item",
-    },
-  },
-  associations: {
-    selectedItems: {
-      singularName: "selectedItem",
-    },
-  },
-  events: {
-    click: {
-      parameters: {
-        count: "int",
-        text: "string",
+class TestClass extends Ui5Base(Control, {
+  metadata: {
+    properties: {
+      text: {
+        type: typed<"on" | "off">()("string"),
+        defaultValue: "on",
+      },
+      active: {
+        type: "boolean",
       },
     },
   },
 }) {
-  constructor() {
-    super();
+  init() {
+    super.init();
 
     this.setText("on");
     this.getText();
     this.getActive();
-    this.attachClick((evt) => {
-      evt.getParameter("count");
-      evt.getParameter("text");
-    });
-    this.getButton();
   }
 }
