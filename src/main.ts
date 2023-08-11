@@ -298,18 +298,21 @@ export function Ui5Base<
 }
 
 export function ui5Extend(name?: string) {
-  return (mockClass: new (...args: any) => any, _: any) => {
+  return (mockClass: new (...args: any) => any, _?: any) => {
     const baseClass = Object.getPrototypeOf(mockClass);
     const result = baseClass.extend(
       name ?? `${mockClass.name}-${crypto.randomUUID()}`,
       Object.assign(
         {
-          renderer: tempClassInfo.renderer,
-          metadata: tempClassInfo.metadata,
+          constructor() {
+            const instance = new mockClass();
+            Object.assign(this, instance);
+          },
         },
-        ...Object.getOwnPropertyNames(mockClass.prototype).map((name) => ({
-          [name]: mockClass.prototype[name],
-        }))
+        tempClassInfo,
+        ...Object.getOwnPropertyNames(mockClass.prototype).map((name) =>
+          name === "constructor" ? {} : { [name]: mockClass.prototype[name] }
+        )
       )
     );
 
