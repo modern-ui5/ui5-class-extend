@@ -279,10 +279,7 @@ let tempClassInfo: {
 } = {};
 
 export function Ui5Base<
-  T extends {
-    new (...args: any): any;
-    extend(name: string, classInfo: any): any;
-  },
+  T extends new (...args: any) => any,
   const M extends MetadataOptions
 >(
   base: T,
@@ -300,7 +297,29 @@ export function Ui5Base<
   return base as any;
 }
 
-class TestClass extends Ui5Base(Control, {
+export function ui5Extend(name?: string) {
+  return (mockClass: new (...args: any) => any, _: any) => {
+    const baseClass = Object.getPrototypeOf(mockClass);
+    const result = baseClass.extend(
+      name ?? `${mockClass.name}-${crypto.randomUUID()}`,
+      Object.assign(
+        {
+          renderer: tempClassInfo.renderer,
+          metadata: tempClassInfo.metadata,
+        },
+        ...Object.getOwnPropertyNames(mockClass.prototype).map((name) => ({
+          [name]: mockClass.prototype[name],
+        }))
+      )
+    );
+
+    tempClassInfo = {};
+    return result;
+  };
+}
+
+@ui5Extend()
+export class TestClass extends Ui5Base(Control, {
   metadata: {
     properties: {
       text: {
