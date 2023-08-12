@@ -8,6 +8,12 @@ import type {
 
 declare const typeTag: unique symbol;
 
+type UnionToIntersection<T> = (T extends any ? (x: T) => any : never) extends (
+  x: infer R
+) => any
+  ? R
+  : never;
+
 type OmitNever<T> = Omit<
   T,
   { [K in keyof T]: T[K] extends never ? K : never }[keyof T]
@@ -156,73 +162,73 @@ type EventsToMethods<T> = {
   };
 };
 
-export type MetadataToInterface<M extends MetadataOptions> =
-  PropertiesToMethods<
+type MetadataToInterface<T, M extends MetadataOptions> = PropertiesToMethods<
+  OmitNever<{
+    [K in keyof M["properties"]]: MetadataItemVisible<
+      M["properties"][K]
+    > extends false
+      ? never
+      : M["properties"][K] extends MetadataOptions.Property
+      ? M["properties"][K]
+      : M["properties"][K];
+  }>
+> &
+  SingleAggregationsToMethods<
     OmitNever<{
-      [K in keyof M["properties"]]: MetadataItemVisible<
-        M["properties"][K]
+      [K in keyof M["aggregations"]]: MetadataItemVisible<
+        M["aggregations"][K]
       > extends false
         ? never
-        : M["properties"][K] extends MetadataOptions.Property
-        ? M["properties"][K]
-        : M["properties"][K];
+        : M["aggregations"][K] extends MetadataOptions.Aggregation & {
+            multiple: false;
+          }
+        ? M["aggregations"][K]
+        : never;
     }>
   > &
-    SingleAggregationsToMethods<
-      OmitNever<{
-        [K in keyof M["aggregations"]]: MetadataItemVisible<
-          M["aggregations"][K]
-        > extends false
-          ? never
-          : M["aggregations"][K] extends MetadataOptions.Aggregation & {
-              multiple: false;
-            }
-          ? M["aggregations"][K]
-          : never;
-      }>
-    > &
-    MultipleAggregationsToMethods<
-      OmitNever<{
-        [K in keyof M["aggregations"]]: MetadataItemVisible<
-          M["aggregations"][K]
-        > extends false
-          ? never
-          : M["aggregations"][K] extends MetadataOptions.Aggregation & {
-              multiple: false;
-            }
-          ? never
-          : M["aggregations"][K];
-      }>
-    > &
-    SingleAssociationsToMethods<
-      OmitNever<{
-        [K in keyof M["associations"]]: MetadataItemVisible<
-          M["associations"][K]
-        > extends false
-          ? never
-          : M["associations"][K] extends MetadataOptions.Association & {
-              multiple: false;
-            }
-          ? M["associations"][K]
-          : never;
-      }>
-    > &
-    MultipleAssociationsToMethods<
-      OmitNever<{
-        [K in keyof M["associations"]]: MetadataItemVisible<
-          M["associations"][K]
-        > extends false
-          ? never
-          : M["associations"][K] extends MetadataOptions.Association & {
-              multiple: false;
-            }
-          ? never
-          : M["associations"][K];
-      }>
-    > &
-    EventsToMethods<M["events"]>;
+  MultipleAggregationsToMethods<
+    OmitNever<{
+      [K in keyof M["aggregations"]]: MetadataItemVisible<
+        M["aggregations"][K]
+      > extends false
+        ? never
+        : M["aggregations"][K] extends MetadataOptions.Aggregation & {
+            multiple: false;
+          }
+        ? never
+        : M["aggregations"][K];
+    }>
+  > &
+  SingleAssociationsToMethods<
+    OmitNever<{
+      [K in keyof M["associations"]]: MetadataItemVisible<
+        M["associations"][K]
+      > extends false
+        ? never
+        : M["associations"][K] extends MetadataOptions.Association & {
+            multiple: false;
+          }
+        ? M["associations"][K]
+        : never;
+    }>
+  > &
+  MultipleAssociationsToMethods<
+    OmitNever<{
+      [K in keyof M["associations"]]: MetadataItemVisible<
+        M["associations"][K]
+      > extends false
+        ? never
+        : M["associations"][K] extends MetadataOptions.Association & {
+            multiple: false;
+          }
+        ? never
+        : M["associations"][K];
+    }>
+  > &
+  EventsToMethods<M["events"]> &
+  (T extends new (...args: any) => infer S ? S : {});
 
-export type MetadataToSettings<T, M extends MetadataOptions> = Partial<
+type MetadataToSettings<T, M extends MetadataOptions> = Partial<
   // Properties
   OmitNever<{
     [K in keyof M["properties"]]: MetadataItemVisible<
@@ -277,4 +283,13 @@ export function typed<T>(): <const U>(value: U) => U & { [typeTag]: T } {
 export interface ClassInfo<M extends MetadataOptions = MetadataOptions> {
   renderer?: unknown;
   metadata?: M;
+}
+
+export interface Ui5BaseConstructor<T, M extends MetadataOptions = {}> {
+  new (settings?: MetadataToSettings<T, M>): MetadataToInterface<T, M>;
+  new (
+    //
+    id?: string,
+    settings?: MetadataToSettings<T, M>
+  ): MetadataToInterface<T, M>;
 }

@@ -1,33 +1,39 @@
 import type { MetadataOptions } from "sap/ui/base/ManagedObject";
-import type {
-  ClassInfo,
-  MetadataToInterface,
-  MetadataToSettings,
-} from "./types.js";
+import type { ClassInfo, Ui5BaseConstructor } from "./types.js";
 
 export * from "./types.js";
 
-let tempClassInfo: ClassInfo = {};
+const classInfoSym = Symbol("classInfo");
 
+export function Ui5Base<T extends new (...args: any) => any>(
+  baseClass: T
+): Ui5BaseConstructor<T>;
 export function Ui5Base<
   T extends new (...args: any) => any,
   const M extends MetadataOptions
->(
-  base: T,
-  classInfo: ClassInfo<M>
-): {
-  new (settings?: MetadataToSettings<T, M>): InstanceType<T> &
-    MetadataToInterface<M>;
-  new (id?: string, settings?: MetadataToSettings<T, M>): InstanceType<T> &
-    MetadataToInterface<M>;
-} {
-  tempClassInfo = classInfo;
-  return base as any;
+>(baseClass: T, classInfo: ClassInfo<M>): Ui5BaseConstructor<T, M>;
+export function Ui5Base<
+  T extends new (...args: any) => any,
+  const M extends MetadataOptions
+>(baseClass: T, classInfo?: ClassInfo<M>): Ui5BaseConstructor<T, M> {
+  return class extends baseClass {
+    static [classInfoSym] = {
+      baseClass,
+      classInfo,
+    };
+  };
 }
 
 export function ui5Extend(name?: string) {
-  return (mockClass: new (...args: any) => any, _?: any) => {
-    const baseClass = Object.getPrototypeOf(mockClass);
+  return <T extends new (...args: any) => any>(mockClass: T, _?: any): T => {
+    if (!(classInfoSym in mockClass) || mockClass[classInfoSym] == null) {
+      throw new TypeError("Class must extend from Ui5Base");
+    }
+
+    const { baseClass, classInfo } = mockClass[classInfoSym] as {
+      baseClass: any;
+      classInfo: ClassInfo;
+    };
 
     if (
       Object.values(Object.getOwnPropertyDescriptors(mockClass.prototype)).find(
@@ -40,26 +46,26 @@ export function ui5Extend(name?: string) {
     const result = baseClass.extend(
       name ?? `${mockClass.name}-${Math.random().toString().slice(2)}`,
       Object.assign(
+        classInfo,
+        ...Object.getOwnPropertyNames(mockClass.prototype).map((name) =>
+          name === "constructor" || name === "init"
+            ? {}
+            : { [name]: mockClass.prototype[name] }
+        ),
         {
-          constructor(this: any) {
+          init: function (this: any) {
             for (const sym of Object.getOwnPropertySymbols(
               mockClass.prototype
             )) {
               this[sym] = mockClass.prototype[sym];
             }
 
-            const instance = new mockClass();
-            Object.assign(this, instance);
+            mockClass.prototype.init.call(this);
           },
-        },
-        tempClassInfo,
-        ...Object.getOwnPropertyNames(mockClass.prototype).map((name) =>
-          name === "constructor" ? {} : { [name]: mockClass.prototype[name] }
-        )
+        }
       )
     );
 
-    tempClassInfo = {};
     return result;
   };
 }

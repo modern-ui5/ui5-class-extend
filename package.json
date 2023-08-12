@@ -10,7 +10,7 @@
     "build": "tsc --project ./tsconfig.build.json && npm run build-test && tsc --project ./tsconfig.json",
     "docs": "typedoc --titleLink \"https://github.com/modern-ui5/ui5-lib-template#readme\" --includeVersion ./src/main.ts",
     "build-test": "tsc --project ./tsconfig.test.json && webpack --config ./webpack.test.config.js --mode development && babel --out-dir ./test_build --extensions .ts,.js ./test",
-    "test": "npm run build-test && wdio run ./wdio.conf.js"
+    "test": "npm run build && wdio run ./wdio.conf.js"
   },
   "repository": {
     "type": "git",
@@ -30,6 +30,7 @@
   "devDependencies": {
     "@babel/cli": "^7.22.9",
     "@babel/core": "^7.22.9",
+    "@babel/plugin-proposal-decorators": "^7.22.10",
     "@babel/preset-env": "^7.22.9",
     "@babel/preset-typescript": "^7.22.5",
     "@babel/register": "^7.22.5",
