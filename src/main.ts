@@ -25,7 +25,7 @@ export function Ui5Base<
 }
 
 export function ui5Extend(name?: string) {
-  return <T extends new (...args: any) => any>(mockClass: T, _?: any): T => {
+  return <T extends new () => any>(mockClass: T, _?: any): T => {
     if (!(classInfoSym in mockClass) || mockClass[classInfoSym] == null) {
       throw new TypeError("Class must extend from Ui5Base");
     }
@@ -48,19 +48,23 @@ export function ui5Extend(name?: string) {
       Object.assign(
         classInfo,
         ...Object.getOwnPropertyNames(mockClass.prototype).map((name) =>
-          name === "constructor" || name === "init"
-            ? {}
-            : { [name]: mockClass.prototype[name] }
+          name === "constructor" ? {} : { [name]: mockClass.prototype[name] }
         ),
         {
-          init: function (this: any) {
+          constructor: function (this: any, ...args: any) {
+            mockClass.prototype.init = () => {};
+
+            const instance = new mockClass();
+            Object.assign(this, instance);
+            instance.destroy();
+
             for (const sym of Object.getOwnPropertySymbols(
               mockClass.prototype
             )) {
               this[sym] = mockClass.prototype[sym];
             }
 
-            mockClass.prototype.init.call(this);
+            baseClass.apply(this, args);
           },
         }
       )

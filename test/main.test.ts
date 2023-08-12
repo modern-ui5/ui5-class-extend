@@ -11,12 +11,17 @@ describe("ui5-class-extend", () => {
     class MyVBox extends Ui5Base(VBox, {
       metadata: {
         properties: {
-          text: "string",
+          text: {
+            type: "string",
+            defaultValue: "",
+          },
         },
       },
       renderer: "sap.m.VBoxRenderer",
     }) {
       init(): void {
+        super.init();
+
         this.addItem(
           new Text(this.getId() + "-text", {
             text: this.getText(),
@@ -25,10 +30,9 @@ describe("ui5-class-extend", () => {
       }
 
       // @ts-ignore
-      setText(value: string | undefined): this {
+      setText(value: string): this {
         (this.getItems()[0] as Text).setText(value);
-        this.setProperty("text", value);
-        return this;
+        return this.setProperty("text", value);
       }
     }
 

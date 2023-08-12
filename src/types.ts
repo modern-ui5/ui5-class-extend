@@ -8,12 +8,6 @@ import type {
 
 declare const typeTag: unique symbol;
 
-type UnionToIntersection<T> = (T extends any ? (x: T) => any : never) extends (
-  x: infer R
-) => any
-  ? R
-  : never;
-
 type OmitNever<T> = Omit<
   T,
   { [K in keyof T]: T[K] extends never ? K : never }[keyof T]
