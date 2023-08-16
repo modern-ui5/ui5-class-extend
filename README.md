@@ -213,7 +213,7 @@ class MyControl extends Ui5Base(Control, {
 - #### Constructors are not supported
 
   If you specify a constructor, everything aside property initializations will
-  be ignored. Instead you can use the `init()` method to do other
+  be ignored. Instead you can use the `init()` method to perform
   initializations.
 
 - #### Accessing `this` during property initializations is not supported
@@ -221,8 +221,8 @@ class MyControl extends Ui5Base(Control, {
   During property initializations `this` refers to a foreign object, therefore
   might result in unexpected behavior when accessed or modified.
 
-  When assigning a bound function to a property, the function itself can refer
-  to `this` again (see also
+  When assigning a bound function to a property, the function body can refer to
+  `this` again (see also
   [Overriding Automatically Generated Methods](#overriding-automatically-generated-methods)).
 
 - #### Accessors and setters are not supported
