@@ -1,8 +1,8 @@
 {
-  "name": "ui5-lib-template",
+  "name": "ui5-class-extend",
   "version": "1.0.0",
   "private": true,
-  "description": "A template repository for a UI5 library project written in TypeScript.",
+  "description": "Type-safe way to write UI5 classes using modern JavaScript classes.",
   "type": "module",
   "browser": "./dist/main.js",
   "types": "./dist/main.d.ts",
