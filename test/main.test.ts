@@ -1,7 +1,7 @@
 import "@wdio/globals/types";
 import "./loadUi5.js";
 import { expect } from "@wdio/globals";
-import { Ui5Base, typed, ui5Extend } from "./dist/main.js";
+import { Ui5Base, ui5Extend } from "./dist/main.js";
 import VBox from "sap/m/VBox";
 import Text from "sap/m/Text";
 import Button from "sap/m/Button";

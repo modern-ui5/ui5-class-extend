@@ -1,5 +1,5 @@
 import type { MetadataOptions } from "sap/ui/base/ManagedObject";
-import type { ClassInfo, Ui5BaseConstructor } from "./types.js";
+import type { ClassInfo, Ui5BaseConstructor, Ui5Base } from "./types.js";
 
 export * from "./types.js";
 
@@ -56,7 +56,7 @@ export function ui5Extend(name?: string) {
 
             const instance = new mockClass();
             delete instance.init;
-            
+
             Object.assign(this, instance);
             instance.destroy();
 

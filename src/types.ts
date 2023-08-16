@@ -5,6 +5,7 @@ import type {
   MetadataOptions,
   PropertyBindingInfo,
 } from "sap/ui/base/ManagedObject";
+import type RenderManager from "sap/ui/core/RenderManager";
 
 declare const typeTag: unique symbol;
 
@@ -287,16 +288,27 @@ export function typed<T>(): <const U extends string>(
   return (value) => value as any;
 }
 
-export interface ClassInfo<M extends MetadataOptions = MetadataOptions> {
-  renderer?: unknown;
-  metadata?: M;
+export interface Renderer<T = any> {
+  apiVersion?: number;
+  render(rm: RenderManager, obj: T): void;
+  [prop: string | symbol]: any;
 }
 
+export interface ClassInfo<M extends MetadataOptions = MetadataOptions> {
+  metadata?: M;
+  renderer?: string | Renderer["render"] | Renderer;
+}
+
+export type Ui5Base<T, M extends MetadataOptions = {}> = MetadataToInterface<
+  T,
+  M
+>;
+
 export interface Ui5BaseConstructor<T, M extends MetadataOptions = {}> {
-  new (settings?: MetadataToSettings<T, M>): MetadataToInterface<T, M>;
+  new (settings?: MetadataToSettings<T, M>): Ui5Base<T, M>;
   new (
     //
     id?: string,
     settings?: MetadataToSettings<T, M>
-  ): MetadataToInterface<T, M>;
+  ): Ui5Base<T, M>;
 }
