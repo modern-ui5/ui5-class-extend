@@ -21,6 +21,18 @@ into valid UI5 code, e.g. with Babel and either
 [babel-plugin-ui5-esm](https://github.com/modern-ui5/babel-plugin-ui5-esm) or
 [babel-plugin-transform-modules-ui5](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/tree/main).
 
+## Why not use `@ui5/ts-interface-generator`?
+
+The tool
+[`@ui5/ts-interface-generator`](https://github.com/SAP/ui5-typescript/tree/main/packages/ts-interface-generator)
+works by generating TypeScript code that add the automatically generated method
+signatures by means of interface merging, adding an additional preprocessing
+step before compiling. Also a one-time manual step is required to fix the
+constructor signature.
+
+In contrast, this library aims to provide the automatically generated method and
+constructor signatures directly at compile time without any additional steps.
+
 ## Usage
 
 ### Extending a Class
@@ -139,7 +151,7 @@ class MyControl extends Ui5Base(Control, {
       text: {
         //                                 v UI5 type
         type: typed<"hello" | "goodbye">()("string"),
-        //          ^ TypeScript type   ^ Due to TypeScript limitation this 
+        //          ^ TypeScript type   ^ Due to TypeScript limitation this
         //            as generic          unusual syntax is required
         defaultValue: "hello",
       },
@@ -204,7 +216,22 @@ class MyControl extends Ui5Base(Control, {
   be ignored. Instead you can use the `init()` method to do other
   initializations.
 
+- #### Accessing `this` during property initializations is not supported
+
+  During property initializations `this` refers to a foreign object, therefore
+  might result in unexpected behavior when accessed or modified.
+
+  When assigning a bound function to a property, the function itself can refer
+  to `this` again (see also
+  [Overriding Automatically Generated Methods](#overriding-automatically-generated-methods)).
+
 - #### Accessors and setters are not supported
 
   A `TypeError` will be thrown if you define accessors or setters in your class.
   You can define a getter/setter method instead.
+
+- #### Generated method signatures don't return `this`
+
+  In UI5, a lot of setter methods return `this` to enable method chaining,
+  however due to a TypeScript limitation, this library will generate methods
+  that return `void` instead of `this`.
