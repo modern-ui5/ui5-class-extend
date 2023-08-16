@@ -51,10 +51,12 @@ export function ui5Extend(name?: string) {
           name === "constructor" ? {} : { [name]: mockClass.prototype[name] }
         ),
         {
-          constructor: function (this: any, ...args: any) {
-            mockClass.prototype.init = () => {};
+          constructor: function (...args: any) {
+            delete mockClass.prototype.init;
 
             const instance = new mockClass();
+            delete instance.init;
+            
             Object.assign(this, instance);
             instance.destroy();
 

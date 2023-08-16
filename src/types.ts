@@ -18,26 +18,30 @@ type TypeStringToType<
   F = any
 > = typeof typeTag extends keyof T
   ? T[typeof typeTag]
-  : T extends "string"
-  ? string
-  : T extends "int" | "float"
-  ? number
-  : T extends "boolean"
-  ? boolean
-  : T extends "object"
-  ? object
-  : T extends "function"
-  ? Function
-  : T extends `${infer U}[]`
-  ? TypeStringToType<U>[]
-  : F;
+  :
+      | (T extends "string"
+          ? string
+          : T extends "int" | "float"
+          ? number
+          : T extends "boolean"
+          ? boolean
+          : T extends "object"
+          ? object
+          : T extends "function"
+          ? Function
+          : T extends `${infer U}[]`
+          ? Exclude<TypeStringToType<U>, undefined>[]
+          : F)
+      | undefined;
 
 type MetadataItemToType<T, F = any> = T extends string
-  ? TypeStringToType<T, F> | undefined
+  ? TypeStringToType<T, F>
   : "type" extends keyof T
-  ?
-      | TypeStringToType<T["type"] & string, F>
-      | ("defaultValue" extends keyof T ? T["defaultValue"] : undefined)
+  ? "defaultValue" extends keyof T
+    ?
+        | Exclude<TypeStringToType<T["type"] & string, F>, undefined>
+        | T["defaultValue"]
+    : TypeStringToType<T["type"] & string, F>
   : F;
 
 type MetadataItemVisible<T> = "visibility" extends keyof T
@@ -129,7 +133,10 @@ type MultipleAssociationsToMethods<T> = {
 
 type EventParameters<T> = "parameters" extends keyof T
   ? {
-      [K in keyof T["parameters"]]: MetadataItemToType<T["parameters"][K]>;
+      [K in keyof T["parameters"]]: Exclude<
+        MetadataItemToType<T["parameters"][K]>,
+        undefined
+      >;
     }
   : {};
 
@@ -152,7 +159,11 @@ type EventsToMethods<T> = {
   ) => void;
 } & {
   [K in keyof T & string as `fire${Capitalize<K>}`]: {
-    (parameters?: object): void;
+    (
+      ...args: {} extends EventParameters<T[K]>
+        ? [parameters?: EventParameters<T[K]>]
+        : [parameters: EventParameters<T[K]>]
+    ): void;
   };
 };
 
@@ -270,7 +281,9 @@ type MetadataToSettings<T, M extends MetadataOptions> = Partial<
 > &
   (T extends new (id: string, settings: infer S) => any ? S : {});
 
-export function typed<T>(): <const U>(value: U) => U & { [typeTag]: T } {
+export function typed<T>(): <const U extends string>(
+  value: U
+) => U & { [typeTag]: T } {
   return (value) => value as any;
 }
 
