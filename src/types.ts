@@ -299,16 +299,11 @@ export interface ClassInfo<M extends MetadataOptions = MetadataOptions> {
   renderer?: string | Renderer["render"] | Renderer;
 }
 
-export type Ui5Base<T, M extends MetadataOptions = {}> = MetadataToInterface<
-  T,
-  M
->;
-
 export interface Ui5BaseConstructor<T, M extends MetadataOptions = {}> {
-  new (settings?: MetadataToSettings<T, M>): Ui5Base<T, M>;
+  new (settings?: MetadataToSettings<T, M>): MetadataToInterface<T, M>;
   new (
     //
     id?: string,
     settings?: MetadataToSettings<T, M>
-  ): Ui5Base<T, M>;
+  ): MetadataToInterface<T, M>;
 }

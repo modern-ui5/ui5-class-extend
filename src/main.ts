@@ -1,5 +1,5 @@
 import type { MetadataOptions } from "sap/ui/base/ManagedObject";
-import type { ClassInfo, Ui5BaseConstructor, Ui5Base } from "./types.js";
+import type { ClassInfo, Ui5BaseConstructor } from "./types.js";
 
 export * from "./types.js";
 
