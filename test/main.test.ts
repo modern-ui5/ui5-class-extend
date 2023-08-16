@@ -97,6 +97,13 @@ describe("ui5-class-extend", () => {
     vbox.destroy();
   });
 
+  it("should fail if class does not extend from Ui5Base", async () => {
+    expect(() => {
+      @ui5Extend()
+      class MyVBox extends VBox {}
+    }).toThrowError(TypeError);
+  });
+
   it("should fail if class contains accessors/setters", async () => {
     expect(() => {
       @ui5Extend()
