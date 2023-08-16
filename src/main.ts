@@ -43,6 +43,8 @@ export function ui5Extend(name?: string) {
       throw new TypeError("Class prototype should not contain accessors");
     }
 
+    const prototypeSymbols = Object.getOwnPropertySymbols(mockClass.prototype);
+
     const result = baseClass.extend(
       name ?? `${mockClass.name}-${Math.random().toString().slice(2)}`,
       Object.assign(
@@ -60,9 +62,7 @@ export function ui5Extend(name?: string) {
             Object.assign(this, instance);
             instance.destroy();
 
-            for (const sym of Object.getOwnPropertySymbols(
-              mockClass.prototype
-            )) {
+            for (const sym of prototypeSymbols) {
               this[sym] = mockClass.prototype[sym];
             }
 
