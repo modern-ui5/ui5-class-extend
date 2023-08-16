@@ -56,7 +56,25 @@ const control = new MyControl("mycontrolid");
 // My Control!
 ```
 
-You can optionally pass a fully qualified name as argument to `ui5Extend`.
+You can optionally pass a fully qualified UI5 name as argument to `ui5Extend`:
+
+```ts
+@ui5Extend("my.controls.MyControl")
+class MyControl extends Ui5Base(Control) {
+  // ...
+}
+```
+
+If you're not able to use decorators, you can also use `ui5Extend()` as a
+function:
+
+```ts
+const MyControl = ui5Extend("my.controls.MyControl")(
+  class MyControl extends Ui5Base(Control) {
+    // ...
+  }
+);
+```
 
 ### Providing Metadata
 
