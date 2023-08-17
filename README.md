@@ -237,7 +237,8 @@ class MyControl extends Ui5Base(Control, {
 - #### Accessing `this` during property initializations is not supported
 
   During property initializations `this` refers to a foreign object, therefore
-  might result in unexpected behavior when accessed or modified.
+  might result in unexpected behavior when accessed or modified. Instead you can
+  use the `init()` method to perform initializations.
 
   When assigning a bound function to a property, the function body can refer to
   `this` again (see also
@@ -253,3 +254,8 @@ class MyControl extends Ui5Base(Control, {
   In UI5, a lot of setter methods return `this` to enable method chaining,
   however due to a TypeScript limitation, this library will generate methods
   that return `void` instead of `this`.
+
+- #### Generated method signatures lack JSDoc
+
+  Even if you annotate the metadata object with JSDoc, the generated methods
+  will not get annotated with the corresponding JSDoc.
