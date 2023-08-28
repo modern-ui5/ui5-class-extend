@@ -212,10 +212,10 @@ type MetadataToInterface<T, M extends MetadataOptions> = PropertiesToMethods<
       > extends false
         ? never
         : M["associations"][K] extends MetadataOptions.Association & {
-            multiple: false;
+            multiple: true;
           }
-        ? M["associations"][K]
-        : never;
+        ? never
+        : M["associations"][K];
     }>
   > &
   MultipleAssociationsToMethods<
@@ -225,10 +225,10 @@ type MetadataToInterface<T, M extends MetadataOptions> = PropertiesToMethods<
       > extends false
         ? never
         : M["associations"][K] extends MetadataOptions.Association & {
-            multiple: false;
+            multiple: true;
           }
-        ? never
-        : M["associations"][K];
+        ? M["associations"][K]
+        : never;
     }>
   > &
   EventsToMethods<M["events"]> &
