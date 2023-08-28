@@ -136,7 +136,7 @@ class MyControl extends Ui5Base(Control, {
     console.log("My Control!");
   }
 
-  setText = function (this: MyControl, value: string): MyControl {
+  setText = (value: string): this => {
     //    ^ Use property initialization syntax
     console.log(`Setting text '${value}'`);
 

@@ -32,7 +32,7 @@ describe("ui5-class-extend", () => {
         );
       }
 
-      setText = function (this: MyVBox, value: string): MyVBox {
+      setText = (value: string): this => {
         (this.getItems()[0] as Text).setText(value);
         return this.setProperty("text", value);
       };
