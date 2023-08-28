@@ -1,6 +1,6 @@
 {
   "name": "ui5-class-extend",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Type-safe way to write UI5 classes using modern JavaScript classes.",
   "type": "module",
   "browser": "./dist/main.js",
