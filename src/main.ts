@@ -15,13 +15,13 @@ export function Ui5Base<
 export function Ui5Base<
   T extends new (...args: any) => any,
   const M extends MetadataOptions
->(baseClass: T, classInfo?: ClassInfo<M>): Ui5BaseConstructor<T, M> {
+>(baseClass: T, classInfo: ClassInfo<M> = {}): Ui5BaseConstructor<T, M> {
   return class extends baseClass {
     static [classInfoSym] = {
       baseClass,
       classInfo,
     };
-  };
+  } as any;
 }
 
 export function ui5Extend(name?: string) {
@@ -69,6 +69,20 @@ export function ui5Extend(name?: string) {
             baseClass.apply(this, args);
           },
         }
+      )
+    );
+
+    Object.assign(
+      result,
+      ...Object.getOwnPropertyNames(mockClass).map((name) =>
+        ["name", "length", "prototype"].includes(name)
+          ? {}
+          : { [name]: mockClass[name as keyof typeof mockClass] }
+      ),
+      ...Object.getOwnPropertySymbols(mockClass).map((sym) =>
+        sym === classInfoSym
+          ? {}
+          : { [sym]: mockClass[sym as keyof typeof mockClass] }
       )
     );
 

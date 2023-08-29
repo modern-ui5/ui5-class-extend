@@ -38,6 +38,8 @@ describe("ui5-class-extend", () => {
       };
     }
 
+    expect(MyVBox.getMetadata().getProperty("text")!.type).toBe("string");
+
     const vbox = new MyVBox("myvbox", {
       text: "Hello World",
     }).placeAt(document.body);
@@ -96,6 +98,19 @@ describe("ui5-class-extend", () => {
 
     vbox.destroy();
   });
+
+  it("should extend with static properties", async () => {
+    @ui5Extend()
+    class MyVBox extends Ui5Base(VBox) {
+      static create(): MyVBox {
+        return new MyVBox();
+      }
+    }
+
+    const vbox = MyVBox.create().placeAt(document.body);
+
+    vbox.destroy();
+  })
 
   it("should fail if class does not extend from Ui5Base", async () => {
     expect(() => {

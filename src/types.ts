@@ -5,6 +5,7 @@ import type {
   MetadataOptions,
   PropertyBindingInfo,
 } from "sap/ui/base/ManagedObject";
+import type ElementMetadata from "sap/ui/core/ElementMetadata";
 import type RenderManager from "sap/ui/core/RenderManager";
 
 declare const typeTag: unique symbol;
@@ -306,4 +307,6 @@ export interface Ui5BaseConstructor<T, M extends MetadataOptions = {}> {
     id?: string,
     settings?: MetadataToSettings<T, M>
   ): MetadataToInterface<T, M>;
+
+  getMetadata(): ElementMetadata;
 }
