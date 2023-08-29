@@ -113,7 +113,9 @@ const control = new MyControl("mycontrolid", {
 ### Overriding Automatically Generated Methods
 
 Due to a TypeScript limitation, to override automatically generated methods you
-need to use the property initialization syntax.
+need to use the property initialization syntax. Please note that arrow functions
+are not supported in this case, see also
+[Caveats](#accessing-this-during-property-initializations-is-not-supported).
 
 ```ts
 import Control from "sap/ui/Control";
@@ -243,6 +245,7 @@ class MyControl extends Ui5Base(Control, {
   When assigning a bound function to a property, the function body can refer to
   `this` again (see also
   [Overriding Automatically Generated Methods](#overriding-automatically-generated-methods)).
+  However, arrow functions are not supported.
 
 - #### Accessors and setters are not supported
 
