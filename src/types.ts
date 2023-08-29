@@ -283,6 +283,29 @@ type MetadataToSettings<T, M extends MetadataOptions> = Partial<
 > &
   (T extends new (id: string, settings: infer S) => any ? S : {});
 
+/**
+ * Use this function to specify a TypeScript type for a UI5 type.
+ * 
+ * ## Example
+ * 
+ * ```ts
+ * import Control from "sap/ui/Control";
+ * 
+ * ＠ui5Extend("optional.name.MyControl")
+ * export class MyControl extends Ui5Base(Control, {
+ *   metadata: {
+ *     properties: {
+ *       state: {
+ *         type: typed<"on" | "off" | "maybe">()("string")
+ *       }
+ *     },
+ *     // …
+ *   }
+ * }) {
+ *   // …
+ * }
+ * ```
+ */
 export function typed<T>(): <const U extends string>(
   value: U
 ) => U & { [typeTag]: T } {

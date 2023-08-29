@@ -5,6 +5,27 @@ export * from "./types.js";
 
 const classInfoSym = Symbol("classInfo");
 
+/**
+ * Use this function in tandem with {@link ui5Extend} to extend a UI5 class.
+ * 
+ * ## Example
+ * 
+ * ```ts
+ * import Control from "sap/ui/Control";
+ * 
+ * ＠ui5Extend("optional.name.MyControl")
+ * export class MyControl extends Ui5Base(Control, {
+ *   metadata: {
+ *     properties: {
+ *       // …
+ *     },
+ *     // …
+ *   }
+ * }) {
+ *   // …
+ * }
+ * ```
+ */
 export function Ui5Base<T extends new (...args: any) => any>(
   baseClass: T
 ): Ui5BaseConstructor<T>;
@@ -24,6 +45,20 @@ export function Ui5Base<
   } as any;
 }
 
+/**
+ * Use this decorator to extend a UI5 class.
+ * 
+ * ## Example
+ * 
+ * ```ts
+ * import Control from "sap/ui/Control";
+ * 
+ * ＠ui5Extend("optional.name.MyControl")
+ * export class MyControl extends Ui5Base(Control) {
+ *   // …
+ * }
+ * ```
+ */
 export function ui5Extend(name?: string) {
   return <T extends new () => any>(mockClass: T, _?: any): T => {
     if (!(classInfoSym in mockClass) || mockClass[classInfoSym] == null) {
